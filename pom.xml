@@ -17,7 +17,7 @@
         <lgc-staffbot.mainClass>eu.lotusgaming.bot.main.Main</lgc-staffbot.mainClass>
 
         <!-- Dependencies Version -->
-        <JDA.version>5.4.0</JDA.version>
+        <JDA.version>5.5.1</JDA.version>
         <Simple-Yaml.version>1.8.4</Simple-Yaml.version>
         <mysql-connector-j.version>8.3.0</mysql-connector-j.version>
     </properties>
