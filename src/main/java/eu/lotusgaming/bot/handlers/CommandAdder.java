@@ -125,6 +125,7 @@ public class CommandAdder {
 					.setContexts(InteractionContextType.GUILD)
 					.addOption(OptionType.CHANNEL, "targetchannel", "The Channel the bot should write in", true)
 					.addOption(OptionType.STRING, "text", "The text the bot should write", true)
+					.addOption(OptionType.BOOLEAN, "useembed", "Should the bot send the message as an embedded message or not? (Default: false)")
 					.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR, Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER)),
 					
 					Commands.slash("purge", "Purge messages from in this channel.")
