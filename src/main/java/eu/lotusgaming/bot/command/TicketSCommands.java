@@ -36,6 +36,12 @@ import eu.lotusgaming.bot.misc.TextCryptor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -51,12 +57,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 public class TicketSCommands extends ListenerAdapter{
 	
@@ -86,11 +88,14 @@ public class TicketSCommands extends ListenerAdapter{
 			
 			if(event.getOption("channel").getAsChannel().getType() == ChannelType.TEXT) {
 				TextChannel channel = event.getOption("channel").getAsChannel().asTextChannel();
-				channel.sendMessageEmbeds(eb.build()).addActionRow(
+				MessageCreateBuilder mcb = new MessageCreateBuilder()
+				.addEmbeds(eb.build())
+				.addComponents(ActionRow.of(
 						Button.primary("gensupp", "General Support").withEmoji(Emoji.fromFormatted("<:lgc_logo:1203440133659959326>")),
 						Button.secondary("premsupp", "Premium Support").withEmoji(Emoji.fromFormatted("U+2B50")),
 						Button.danger("repuser", "Report a User").withEmoji(Emoji.fromFormatted("U+1F46E"))
-						).queue();
+				));
+				channel.sendMessage(mcb.build()).queue();
 				event.reply("Support Ticket Info Channel has been sent and set to " + channel.getAsMention()).queue();
 			}else {
 				event.deferReply(true).queue();
@@ -271,11 +276,15 @@ public class TicketSCommands extends ListenerAdapter{
 						eb.setTitle("Close Request");
 						eb.setDescription(event.getMember().getAsMention() + " has requested to close this ticket. \nReason: ``" + reason + "``");
 						eb.setFooter("Please accept or deny using the buttons below.");
-						
-						event.deferReply().addContent(user.getAsMention()).addEmbeds(eb.build()).addActionRow(
+
+						MessageCreateBuilder mcb = new MessageCreateBuilder()
+						.addEmbeds(eb.build())
+						.addComponents(ActionRow.of(
 								Button.success("closeYes", "Accept & Close"),
 								Button.primary("closeNo", "Deny & Keep Open")
-								).queue();
+								));
+						
+						event.reply(mcb.build()).addContent(user.getAsMention()).queue();
 					}else {
 						String reason = event.getOption("reason").getAsString();
 						User user = event.getJDA().getUserById(getTicketCreator(event.getChannel().getIdLong()));
@@ -286,10 +295,14 @@ public class TicketSCommands extends ListenerAdapter{
 						eb.setDescription(event.getMember().getAsMention() + " has requested to close this ticket. \nReason: ``" + reason + "``");
 						eb.setFooter("Please accept or deny using the buttons below.");
 						
-						event.deferReply().addContent(user.getAsMention()).addEmbeds(eb.build()).addActionRow(
+						MessageCreateBuilder mcb = new MessageCreateBuilder()
+						.addEmbeds(eb.build())
+						.addComponents(ActionRow.of(
 								Button.success("closeYes", "Accept & Close"),
 								Button.primary("closeNo", "Deny & Keep Open")
-								).queue();
+								));
+						
+						event.reply(mcb.build()).addContent(user.getAsMention()).queue();
 					}
 					
 					
@@ -329,9 +342,12 @@ public class TicketSCommands extends ListenerAdapter{
 						ra.sendMessage("" + member.getAsMention() + " " + target.getAsMention()).queue(ra1 -> {
 							ra1.delete().queueAfter(2, TimeUnit.SECONDS);
 						});
-						ra.sendMessageEmbeds(eb.build()).addActionRow(
+						MessageCreateBuilder mcb = new MessageCreateBuilder()
+						.addEmbeds(eb.build())
+						.addComponents(ActionRow.of(
 								Button.danger("closereasons", "Close with Reason").withEmoji(Emoji.fromFormatted("U+1F512"))
-								).queue();
+								));
+						ra.sendMessage(mcb.build()).queue();
 					});
 				}else {
 					event.deferReply(true).addContent("The user is not present on this guild!").queue();
@@ -383,11 +399,14 @@ public class TicketSCommands extends ListenerAdapter{
 						chan.sendMessage("" + member.getAsMention()).queue(ra -> {
 							ra.delete().queueAfter(5, TimeUnit.SECONDS);
 						});
-						chan.sendMessageEmbeds(eb.build()).addActionRow(
+						MessageCreateBuilder mcb = new MessageCreateBuilder()
+						.addEmbeds(eb.build())
+						.addComponents(ActionRow.of(
 								Button.danger("closenoreason", "Close").withEmoji(Emoji.fromFormatted("U+1F512")),
 								Button.danger("closereason", "Close with Reason").withEmoji(Emoji.fromFormatted("U+1F512")),
 								Button.danger("closerate", "Rate and Close").withEmoji(Emoji.fromFormatted("U+1F522"))
-								).queue();
+								));
+						chan.sendMessage(mcb.build()).queue();
 					});
 				}
 			}
@@ -411,18 +430,18 @@ public class TicketSCommands extends ListenerAdapter{
 				if(hasActiveTicket(event.getUser().getIdLong())) {
 					event.deferReply(true).addContent("You've already an active ticket. Finalise this first!").queue();
 				}else {
-					TextInput mcuuid = TextInput.create("uuid", "Minecraft Name", TextInputStyle.SHORT)
-							.setPlaceholder("Your Minecraft Name")
+					Modal mdl = Modal.create("premsuppmodal", "Premium Support")
+					.addComponents(
+						Label.of("Minecraft Name", TextInput.create("uuid", TextInputStyle.SHORT)
+							.setPlaceholder("Please enter your Minecraft Name here.")
 							.setRequiredRange(3, 16)
-							.build();
-					TextInput mail = TextInput.create("mail", "E-Mail", TextInputStyle.SHORT)
-							.setPlaceholder("Your E-Mail Adress")
+							.build()),
+						Label.of("E-Mail", TextInput.create("mail", TextInputStyle.SHORT)
+							.setPlaceholder("Please enter your E-Mail Address here.")
 							.setRequiredRange(5, 48)
-							.build();
-					Modal modal = Modal.create("premsuppmodal", "Premium Support")
-							.addComponents(ActionRow.of(mcuuid), ActionRow.of(mail))
-							.build();
-					event.replyModal(modal).queue();
+							.build())
+					).build();
+					event.replyModal(mdl).queue();
 				}
 			}
 		}else if(event.getComponentId().equals("repuser")) {
@@ -445,30 +464,40 @@ public class TicketSCommands extends ListenerAdapter{
 				if(hasActiveTicket(event.getUser().getIdLong())) {
 					event.deferReply(true).addContent("You've already an active ticket. Finalise this first!").queue();
 				}else {
-					TextInput uid = TextInput.create("uid", "UserID", TextInputStyle.SHORT)
+					Modal mdl = Modal.create("repusermodal", "Report a User")
+					.addComponents(
+						Label.of("UserID", TextInput.create("uid", TextInputStyle.SHORT)
 							.setPlaceholder("The UserID from the user")
 							.setRequiredRange(2, 32)
-							.build();
-					TextInput desc = TextInput.create("reason", "Reason", TextInputStyle.PARAGRAPH)
+							.build()),
+						Label.of("Reason", TextInput.create("reason", TextInputStyle.PARAGRAPH)
 							.setPlaceholder("A brief description what the user did.")
 							.setRequired(false)
 							.setRequiredRange(0, 256)
-							.build();
-					Modal modal = Modal.create("repusermodal", "Report a User")
-							.addComponents(ActionRow.of(uid), ActionRow.of(desc))
-							.build();
-					event.replyModal(modal).queue();
+							.build())
+					).build();
+					event.replyModal(mdl).queue();
 				}
 			}
 		}else if(event.getComponentId().equals("closereason")) {
-			TextInput reason = TextInput.create("closereason", "Reason", TextInputStyle.SHORT)
-					.setPlaceholder("Reason")
-					.setValue("Ticket resolved.")
-					.setRequiredRange(10, 128)
-					.build();
+			Modal mdl = Modal.create("closeticketmodal", "Close Ticket")
+					.addComponents(
+						Label.of("Reason", TextInput.create("closereason", TextInputStyle.SHORT)
+							.setPlaceholder("Reason")
+							.setValue("Ticket resolved.")
+							.setRequiredRange(10, 128)
+							.build())
+					).build();
+			event.replyModal(mdl).queue();
+		}else if(event.getComponentId().equals("closereason")) {
 			Modal modal = Modal.create("closeticketmodal", "Close Ticket")
-					.addComponents(ActionRow.of(reason))
-					.build();
+					.addComponents(
+						Label.of("Reason", TextInput.create("closereason", TextInputStyle.SHORT)
+							.setPlaceholder("Reason")
+							.setValue("Ticket resolved.")
+							.setRequiredRange(10, 128)
+							.build())
+					).build();
 			event.replyModal(modal).queue();
 			
 		}else if(event.getComponentId().equals("closenoreason")) {
@@ -481,20 +510,22 @@ public class TicketSCommands extends ListenerAdapter{
 		}else if(event.getComponentId().equals("closereasons")) {
 			Member member = event.getMember();
 			if(member.hasPermission(Permission.BAN_MEMBERS, Permission.KICK_MEMBERS)) {
-				TextInput reason = TextInput.create("closereason", "Reason", TextInputStyle.SHORT)
-						.setPlaceholder("Reason")
-						.setValue("Ticket resolved.")
-						.setRequiredRange(10, 128)
-						.build();
-				Modal modal = Modal.create("closeticketmodal", "Close Ticket")
-						.addComponents(ActionRow.of(reason))
-						.build();
-				event.replyModal(modal).queue();
+				Modal mdl = Modal.create("closeticketmodal", "Close Ticket")
+					.addComponents(
+						Label.of("Reason", TextInput.create("closereason", TextInputStyle.SHORT)
+							.setPlaceholder("Reason")
+							.setValue("Ticket resolved.")
+							.setRequiredRange(10, 128)
+							.build())
+					).build();
+				event.replyModal(mdl).queue();
 			}else {
 				event.deferReply(true).addContent("You cannot close the Ticket!").queue();
 			}
 		}else if(event.getComponentId().equals("closerate")) {
-			event.reply("Rate the overall quality of this ticket.").addActionRow(
+			MessageCreateBuilder mcb = new MessageCreateBuilder()
+			.addContent("Rate the overall quality of this ticket.")
+			.addComponents(ActionRow.of(
 				StringSelectMenu.create("ticketratemenu")
 				.addOption("Excellent", "1")
 				.addOption("Very Good", "2")
@@ -503,7 +534,8 @@ public class TicketSCommands extends ListenerAdapter{
 				.addOption("Bad", "5")
 				.addOption("Very Bad", "6")
 				.build()
-			).queue();
+			));
+			event.reply(mcb.build()).queue();
 		}else if(event.getComponentId().equals("closeYes")) {
 			event.deferReply(true).addContent("Ticket will be closed in 5 seconds...").queue();
             TextChannel channel = event.getChannel().asTextChannel();
@@ -528,18 +560,18 @@ public class TicketSCommands extends ListenerAdapter{
 	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
 		if(event.getComponentId().equals("ticketratemenu")) {
 			String val = event.getValues().get(0);
-			TextInput rate = TextInput.create("ratetext", "Description", TextInputStyle.PARAGRAPH)
-					.setPlaceholder("Rate your ticket thoroughly. Optional")
-					.setRequiredRange(0, 2000)
-					.setRequired(false)
-					.build();
-			TextInput closeReason = TextInput.create("closereason", "Reason for Ticket Closure", TextInputStyle.PARAGRAPH)
-					.setValue("Ticket has been Resolved.")
-					.setRequiredRange(0, 1000)
-					.build();
 			Modal modal = Modal.create("ratemodal", "Rate the Ticket")
-					.addComponents(ActionRow.of(rate), ActionRow.of(closeReason))
-					.build();
+					.addComponents(
+						Label.of("Rate", TextInput.create("ratetext", TextInputStyle.PARAGRAPH)
+							.setPlaceholder("Rate your ticket thoroughly. Optional")
+							.setRequiredRange(0, 2000)
+							.setRequired(false)
+							.build()),
+						Label.of("Close Reason", TextInput.create("closereason", TextInputStyle.PARAGRAPH)
+							.setValue("Ticket has been Resolved.")
+							.setRequiredRange(0, 1000)
+							.build())
+					).build();
 			addRateToTicket(event.getChannelIdLong(), val);
 			event.replyModal(modal).queue();
 		}
@@ -582,11 +614,14 @@ public class TicketSCommands extends ListenerAdapter{
 				chan.sendMessage("" + discMod.getAsMention() + " " + member.getAsMention()).queue(ra -> {
 					ra.delete().queueAfter(10, TimeUnit.SECONDS);
 				});
-				chan.sendMessageEmbeds(eb.build()).addActionRow(
+				MessageCreateBuilder mcb = new MessageCreateBuilder()
+				.addEmbeds(eb.build())
+				.addComponents(ActionRow.of(
 						Button.danger("closenoreason", "Close").withEmoji(Emoji.fromFormatted("U+1F512")),
 						Button.danger("closereason", "Close with Reason").withEmoji(Emoji.fromFormatted("U+1F512")),
 						Button.danger("closerate", "Rate and Close").withEmoji(Emoji.fromFormatted("U+1F522"))
-						).queue();
+						));
+				chan.sendMessage(mcb.build()).queue();
 			});
 		}else if(event.getModalId().equals("premsuppmodal")) {
 			event.deferReply(true).addContent("A ticket will be opened").queue();
@@ -609,11 +644,14 @@ public class TicketSCommands extends ListenerAdapter{
 				chan.sendMessage("" + support.getAsMention() + " " + member.getAsMention()).queue(ra -> {
 					ra.delete().queueAfter(10, TimeUnit.SECONDS);
 				});
-				chan.sendMessageEmbeds(eb.build()).addActionRow(
+				MessageCreateBuilder mcb = new MessageCreateBuilder()
+				.addEmbeds(eb.build())
+				.addComponents(ActionRow.of(
 						Button.danger("closenoreason", "Close").withEmoji(Emoji.fromFormatted("U+1F512")),
 						Button.danger("closereason", "Close with Reason").withEmoji(Emoji.fromFormatted("U+1F512")),
 						Button.danger("closerate", "Rate and Close").withEmoji(Emoji.fromFormatted("U+1F522"))
-						).queue();
+						));
+				chan.sendMessage(mcb.build()).queue();
 			});
 		}else if(event.getModalId().equals("closeticketmodal")) {
 			TextChannel channel = event.getChannel().asTextChannel();
