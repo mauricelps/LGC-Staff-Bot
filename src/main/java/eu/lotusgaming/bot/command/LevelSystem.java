@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -31,9 +33,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.utils.FileUpload;
 
 public class LevelSystem extends ListenerAdapter {
@@ -253,8 +257,39 @@ public class LevelSystem extends ListenerAdapter {
 			} catch (IOException | FontFormatException e) {
 				e.printStackTrace();
 			}
-			
-			//event.reply(result).queue();
+		}else if(event.getName().equals("levelsettings")){
+			String scn = event.getSubcommandName();
+			if(scn.equals("levelcard")){
+				String color = event.getOption("color").getAsString();
+
+			}
+		}
+	}
+
+	private static final String[] colors = new String[] {
+		"Blue", "Crimson Red", "Deep Pink", "Dark Orange", "Gold", "Medium Purple", "Lime", "Cyan", "Sienna Brown", "Gray", "White", "Black"
+	};
+
+	@Override
+	public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
+		if(event.getName().equals("levelsettings")) {
+			String scn = event.getSubcommandName();
+			if(scn.equals("levelcard") && event.getFocusedOption().getName().equals("color")){
+				List<Command.Choice> options = Stream.of(colors)
+						.filter(c -> c.toLowerCase().startsWith(event.getFocusedOption().getValue().toLowerCase()))
+						.map(c -> new Command.Choice(c, c))
+						.collect(Collectors.toList());
+				event.replyChoices(options).queue();
+			}
+		}else if(event.getName().equals("levelsettings")) {
+			String scn = event.getSubcommandName();
+			if(scn.equals("levelupcard") && event.getFocusedOption().getName().equals("color")){
+				List<Command.Choice> options = Stream.of(colors)
+						.filter(c -> c.toLowerCase().startsWith(event.getFocusedOption().getValue().toLowerCase()))
+						.map(c -> new Command.Choice(c, c))
+						.collect(Collectors.toList());
+				event.replyChoices(options).queue();
+			}
 		}
 	}
 	
@@ -474,6 +509,21 @@ public class LevelSystem extends ListenerAdapter {
 			e.printStackTrace();
 		}
 	}
+
+	private enum Card {
+		LEVELCARD,
+		LEVELUPCARD
+	}
+
+	private void setColor(String color, Card card, long userId) {
+		try(PreparedStatement ps = MySQL.getConnection().prepareStatement("UPDATE bot_s_chatlevelUO SET " + (card == Card.LEVELCARD ? "bg_color_levelcard" : "bg_color_levelup") + " = ? WHERE memberId = ?")){
+			ps.setString(1, color);
+			ps.setLong(2, userId);
+			ps.executeUpdate();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public int getPointsForCurrentLevel(int level) {
 		switch(level) {
@@ -536,6 +586,22 @@ public class LevelSystem extends ListenerAdapter {
 		case 57: return 26000;
 		case 58: return 28000;
 		case 59: return 30000;
+		case 60: return 32500;
+		case 61: return 35000;
+		case 62: return 37500;
+		case 63: return 40000;
+		case 64: return 42500;
+		case 65: return 45000;
+		case 66: return 47500;
+		case 67: return 50000;
+		case 68: return 55000;
+		case 69: return 60000;
+		case 70: return 65000;
+		case 71: return 70000;
+		case 72: return 75000;
+		case 73: return 100000;
+		case 74: return 125000;
+		case 75: return 150000;
 		default: return 0;
 		}
 	}
@@ -601,6 +667,22 @@ public class LevelSystem extends ListenerAdapter {
 		case 57: return 26000;
 		case 58: return 28000;
 		case 59: return 30000;
+		case 60: return 32500;
+		case 61: return 35000;
+		case 62: return 37500;
+		case 63: return 40000;
+		case 64: return 42500;
+		case 65: return 45000;
+		case 66: return 47500;
+		case 67: return 50000;
+		case 68: return 55000;
+		case 69: return 60000;
+		case 70: return 65000;
+		case 71: return 70000;
+		case 72: return 75000;
+		case 73: return 100000;
+		case 74: return 125000;
+		case 75: return 150000;
 		default: return 0;
 		}
 	}
