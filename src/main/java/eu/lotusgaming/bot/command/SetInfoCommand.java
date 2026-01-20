@@ -31,13 +31,16 @@ public class SetInfoCommand extends ListenerAdapter{
 				}
 			}
 		}else if(event.getName().equals("updateinfo")) {
-			long targetMessage = event.getOption("messageid").getAsLong();
+			String targetMessage = event.getOption("messageid").getAsString();
+			if(!targetMessage.matches("^[0-9]-$")){
+				event.deferReply(true).addContent("The Message ID must be a valid number!").queue();
+				return;
+			}
 			if(event.getOption("channel").getAsChannel().getType() == ChannelType.TEXT) {
 				TextChannel targetChannel = event.getOption("channel").getAsChannel().asTextChannel();
-				info_updateBlockTeam(event.getGuild(), targetMessage, targetChannel);
+				info_updateBlockTeam(event.getGuild(), Long.parseLong(targetMessage), targetChannel);
 			}else {
 				event.deferReply(true).addContent("The Channel must be a text channel!").queue();
-				return;
 			}
 		}
 	}
@@ -61,6 +64,7 @@ public class SetInfoCommand extends ListenerAdapter{
 		info.add("<:x_twitter:1298613146537300009> [@lotusgamingeu](https://x.com/lotusgamingeu)");
 		info.add("<:threads:1298613145035604059> [@lotuscommunityeu](https://www.threads.net/@lotuscommunityeu)");
 		info.add("<:bsky:1363469765846503534> [@lotusgamingeu.bsky.social](https://bsky.app/profile/lotusgamingeu.bsky.social)");
+		info.add("<:whatsapp:1403810214347800638> [Lotus Gaming Community WhatsApp Channel](https://whatsapp.com/channel/0029Vb9HjskKgsNkm3V06t2d)");
 		StringBuilder sb = new StringBuilder();
 		for(String s : info) {
 			sb.append(s);
@@ -83,8 +87,8 @@ public class SetInfoCommand extends ListenerAdapter{
 			Role role = guild.getRoleById(l);
 			if(role != null) {
 				List<Member> members = guild.getMembersWithRoles(role);
-				if(members.size() != 0) {
-					eb.addField(role.getName() + "(" + members.size() + ")", getFromList(members), false);
+				if(!members.isEmpty()) {
+					eb.addField(role.getName() + " (" + members.size() + ")", getFromList(members), false);
 				}
 			}
 		}
@@ -101,8 +105,8 @@ public class SetInfoCommand extends ListenerAdapter{
 				Role role = guild.getRoleById(l);
 				if(role != null) {
 					List<Member> members = guild.getMembersWithRoles(role);
-					if(members.size() != 0) {
-						eb.addField(role.getName() + "(" + members.size() + ")", getFromList(members), false);
+					if(!members.isEmpty()) {
+						eb.addField(role.getName() + " (" + members.size() + ")", getFromList(members), false);
 					}
 				}
 			}
@@ -112,24 +116,31 @@ public class SetInfoCommand extends ListenerAdapter{
 	
 	List<Long> getAllStaffRoles() {
 		List<Long> staffRoles = new ArrayList<>();
-		staffRoles.add(1342113575367610438L); //Owner
-		staffRoles.add(1155572809356038154l); //project leader
-		staffRoles.add(1155573840651485246l); //vice project leader
-		staffRoles.add(1155573844199870574l); //staff manager
-		staffRoles.add(1155573847270113321l); //human resources
-		staffRoles.add(1155573850776535061l); //quality assurance manager
+		staffRoles.add(1155572809356038154L); //project leader
+		staffRoles.add(1155573840651485246L); //vice project leader
+		staffRoles.add(1155573847270113321L); //human resources
+		staffRoles.add(1155573844199870574L); //staff manager
+		staffRoles.add(1412151205534240859L); //dev mgr
+		staffRoles.add(1155573850776535061L); //quality assurance manager
+		staffRoles.add(1412151327298949160L); //lfm mgr
 		staffRoles.add(1301224974773653534L); //Ads, PR & Social Media Manager
-		staffRoles.add(1155573857130905650l); //developer
-		staffRoles.add(1208893851033407539l); //service data analyst
+		staffRoles.add(1208893851033407539L); //service data analyst
 		staffRoles.add(1155573860343746630l); //staff supervisor
-		staffRoles.add(1155573863015514153l); //administrator
-		staffRoles.add(1155573867029467316l); //moderator
-		staffRoles.add(1201834197149552640l); //addon team
-		staffRoles.add(1155573869827072022l); //support
-		staffRoles.add(1155573873216069632l); //translator
-		staffRoles.add(1155573876579905696l); //designer
+		//-- Upper Staff End / Staff Start --
+		staffRoles.add(1155573857130905650L); //developer
+		staffRoles.add(1201834197149552640L); //addon team
+		staffRoles.add(1155573863015514153L); //administrator
+		staffRoles.add(1155573867029467316L); //moderator
+		staffRoles.add(1412151344739127406L); //lfm live presenter
+		staffRoles.add(1412151350795440340L); //lfm dj
+		staffRoles.add(1412151355614822520L); //lfm playlist curator
+		staffRoles.add(1412151427631157360L); //lfm redactor
 		staffRoles.add(1230974344277131396L); //social media team
-		staffRoles.add(1155573879964700802l); //builder
+		staffRoles.add(1155573869827072022L); //support
+		staffRoles.add(1155573873216069632L); //translator
+		staffRoles.add(1155573876579905696L); //designer
+		staffRoles.add(1155573879964700802L); //builder
+		staffRoles.add(1412152146014502972L); //event
 		return staffRoles;
 	}
 	
