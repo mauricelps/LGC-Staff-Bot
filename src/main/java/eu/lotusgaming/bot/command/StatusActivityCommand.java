@@ -9,8 +9,12 @@ import java.util.stream.Stream;
 
 import org.simpleyaml.configuration.file.YamlFile;
 
+import com.github.theholywaffle.teamspeak3.api.wrapper.Message;
+
 import eu.lotusgaming.bot.main.LotusManager;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -18,7 +22,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 public class StatusActivityCommand extends ListenerAdapter{
 	
@@ -45,7 +49,10 @@ public class StatusActivityCommand extends ListenerAdapter{
 				onlinestatus.addOption("Online", "ONLINE");
 				onlinestatus.addOption("Idle", "IDLE");
 				onlinestatus.addOption("Do Not Disturb", "DONOTDISTURB");
-				event.deferReply(true).addContent("Select the new status for me :)").addActionRow(onlinestatus.build()).queue();
+				MessageCreateBuilder mcb = new MessageCreateBuilder();
+				mcb.setContent("Select the new status for me :)");
+				mcb.addComponents(ActionRow.of(onlinestatus.build()));
+				event.reply(mcb.build()).setEphemeral(true).queue();
 			}else {
 				event.deferReply(true).addContent("Sorry, but you are not permitted to change stuff on me. Who do you think you are thinking you could change me lol?").queue();
 			}

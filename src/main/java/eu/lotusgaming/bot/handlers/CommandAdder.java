@@ -125,6 +125,7 @@ public class CommandAdder {
 					.setContexts(InteractionContextType.GUILD)
 					.addOption(OptionType.CHANNEL, "targetchannel", "The Channel the bot should write in", true)
 					.addOption(OptionType.STRING, "text", "The text the bot should write", true)
+					.addOption(OptionType.BOOLEAN, "useembed", "Should the bot send the message as an embedded message or not? (Default: false)")
 					.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR, Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER)),
 					
 					Commands.slash("purge", "Purge messages from in this channel.")
@@ -146,6 +147,22 @@ public class CommandAdder {
 					
 					Commands.slash("level", "See your or someone else's current Level")
 					.addOption(OptionType.USER, "member", "The member to lookup."),
+
+					Commands.slash("levelsettings", "Manage your level preferences for this server")
+					.setContexts(InteractionContextType.GUILD)
+					.addSubcommands(
+						new SubcommandData("levelcard", "Manage the level card settings")
+						.addOption(OptionType.STRING, "color", "The color of the level card", true, true),
+
+						new SubcommandData("levelupcard", "Manage the level up card settings")
+						.addOption(OptionType.STRING, "color", "The color of the level up card", true, true),
+
+						new SubcommandData("allowseasoncards", "Allow or disallow season cards")
+						.addOption(OptionType.BOOLEAN, "enabled", "Whether season cards are enabled or not", true),
+
+						new SubcommandData("useimageortext", "Should the Level Up Notification and Level Card be based as Image (Default) or as Text?")
+						.addOption(OptionType.BOOLEAN, "useimage", "Whether to use an image or text", true)
+					),
 					
 					Commands.slash("mclookup", "Player Lookup on Lotus for Minecraft")
 					.setContexts(InteractionContextType.GUILD)
